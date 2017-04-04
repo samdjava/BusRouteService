@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://jakarta.apache.org/log4j/ ">
+
+    <appender name="bus-route" class="org.apache.log4j.rolling.RollingFileAppender">
+        <rollingPolicy class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
+            <param name="ActiveFileName" value="${catalina.base}/logs/bus-route.log"/>
+            <param name="FileNamePattern" value="${catalina.base}/logs/bus-route.log.%d.gz"/>
+        </rollingPolicy>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%5p   %d %c:%t - %m%n"/>
+        </layout>
+    </appender>
+
+
+    <root>
+        <level value="INFO"/>
+        <appender-ref ref="bus-route"/>
+    </root>
+
+</log4j:configuration>
