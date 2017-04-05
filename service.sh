@@ -3,43 +3,42 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #echo $DIR
 # Keep the pwd in mind!
 # Example: RUN="java -jar $DIR/target/magic.jar"
+# Assumption port is 8088
 RUN="java -jar target/BusRouteService-1.0.jar"
 NAME="BusRouteService"
-
+PORT="8088"
 DATA_FILE=$2
 
-PIDFILE="/tmp/$NAME.pid"
+#PIDFILE="/tmp/$NAME.pid"
 LOGFILE="/tmp/$NAME.log"
 
 start() {
-    if [ -f $PIDFILE ]; then
-	    if kill -0 $(cat $PIDFILE); then
+    processId=`netstat -nltp | grep $PORT | awk '{print $7}' | awk '{split($0,x,"/"); print x[1]'}`    
+    if [ ! -z $processId ] ; then
+	 if [ kill -0 $processId ]; then
             echo 'Service already running' >&2
             return 1
-        else
-            rm -f $PIDFILE
-        fi
+         fi
     fi
     echo $RUN $DATA_FILE
     local CMD="$RUN $DATA_FILE &> \"$LOGFILE\" & echo \$!"
-    sh -c "$CMD" > $PIDFILE
+    sh -c "$CMD"
 }
 
 stop() {
     echo "Shutting down"
-    if [ ! -f $PIDFILE ] ;then
-        echo 'Service not running' >&2
-        return 1
+    processId=`netstat -nltp | grep $PORT | awk '{print $7}' | awk '{split($0,x,"/"); print x[1]'}`    
+    if [ -z $processId ] ; then
+    echo 'Service not running' >&2
     else
-          pid = $(cat $PIDFILE) - 1
-          echo $pid
-          if [ ! kill -0 $(cat $PIDFILE) ] ;then
+        if ! kill -0 $processId ;then
              echo 'Service not running' >&2
              return 1
           else
-             kill -15 $pid && rm -f $PIDFILE
+             echo 'Service is running' >&2  
+             kill -15 $processId
           fi
-     fi
+    fi
 }
 
 
